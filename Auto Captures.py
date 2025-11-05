@@ -1,0 +1,45 @@
+import pyautogui
+import time
+from pptx import Presentation
+from pptx.util import Inches
+from io import BytesIO
+
+# ================ CONFIGURATION ===================
+num_slides_to_capture = 30          # Number of slides to capture
+wait_between_slides = 0.1             # Time to wait after moving to next slide
+switch_time = 5                    # Time to switch to browser before starting
+ppt_filename = r"D:\ss\kk.pptx"  # File will be saved on D:\Conclave ppt Folder
+
+# Create PowerPoint presentation
+prs = Presentation()
+
+# Countdown before starting
+print(f"Switch to your browser in full-screen mode in {switch_time} seconds...")
+time.sleep(switch_time)
+
+for slide_num in range(1, num_slides_to_capture + 1):
+    print(f"Capturing Slide {slide_num}...")
+
+    # Wait for slide to load
+    time.sleep(wait_between_slides)
+
+    # Take screenshot
+    screenshot = pyautogui.screenshot()
+
+    # Save screenshot in memory
+    image_stream = BytesIO()
+    screenshot.save(image_stream, format='PNG')
+    image_stream.seek(0)
+
+    # Create new slide
+    slide = prs.slides.add_slide(prs.slide_layouts[6])  # Blank layout
+
+    # Insert screenshot image (adjust size to fill most of slide)
+    slide.shapes.add_picture(image_stream, Inches(0.5), Inches(0.5), width=Inches(9), height=Inches(5))
+
+    # Move to next slide in browser
+    pyautogui.press('right')
+
+# Save PowerPoint file
+prs.save(ppt_filename)
+print(f"✅ Done! All slides saved in {ppt_filename}")
